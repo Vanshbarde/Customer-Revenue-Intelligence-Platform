@@ -16,13 +16,30 @@ Workflow
 6. Generate cleaning report
 7. Continue with next dataset
 
-Author:
-    Your Name
-==========================================================
+=================================================
 """
+
+
+# importing util for logging and pipeline run tracking the date and time of the run
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+sys.path.append(str(PROJECT_ROOT))
+
+from datetime import datetime
+
+from utils.pipeline_logger import (
+    log_pipeline_run
+)
+
+
 
 import time
 import logging
+import subprocess
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -354,8 +371,6 @@ def run_pipeline():
     # Loop Through Every Dataset
     # ---------------------------------------------
 
-    print(DATASETS.keys())
-
 
     for dataset_name, config in DATASETS.items():
 
@@ -424,6 +439,34 @@ def run_pipeline():
     logger.info("=" * 70)
 
     return reports
+
+
+# ---------------------------------------------------------
+# Load Processed Tables Into PostgreSQL
+# ---------------------------------------------------------
+
+def load_processed_tables_to_postgres():
+
+    """
+    Load processed CSV files and report tables into PostgreSQL.
+    """
+
+    logger.info("")
+    logger.info("=" * 80)
+    logger.info("LOADING PROCESSED TABLES INTO POSTGRESQL")
+    logger.info("=" * 80)
+
+    script_path = Path(__file__).parent / "load_to_postgres.py"
+
+    subprocess.run(
+
+        [sys.executable, str(script_path)],
+
+        check=True
+
+    )
+
+    logger.info("PostgreSQL loading completed successfully.")
 
 
     # ---------------------------------------------------------
@@ -550,74 +593,136 @@ def main():
 
     pipeline_start = time.time()
 
-    logger.info("")
+    start_time = datetime.now()
 
-    logger.info("=" * 80)
+    try:
 
-    logger.info("STARTING ETL PIPELINE")
+        logger.info("")
 
-    logger.info("=" * 80)
+        logger.info("=" * 80)
 
-    reports = run_pipeline()
+        logger.info("STARTING ETL PIPELINE")
 
-    save_cleaning_report(
-        reports
-    )
+        logger.info("=" * 80)
 
-    # =====================================================
-    # VALIDATION PIPELINE
-    # =====================================================
+        reports = run_pipeline()
 
-    logger.info("")
-    logger.info("=" * 80)
-    logger.info("STARTING VALIDATION PIPELINE")
-    logger.info("=" * 80)
+        records_processed = 0
 
-    validation_status = run_validation_pipeline(
-    DATASETS
-)
+        for report in reports:
 
-    if validation_status:
+            if "Rows After" in report:
+
+                records_processed += report["Rows After"]
+
+        save_cleaning_report(
+            reports
+        )
+
+        # =====================================================
+        # VALIDATION PIPELINE
+        # =====================================================
+
+        logger.info("")
+
+        logger.info("=" * 80)
+
+        logger.info("STARTING VALIDATION PIPELINE")
+
+        logger.info("=" * 80)
+
+        validation_result = run_validation_pipeline(
+            DATASETS
+        )
+
+        if validation_result["critical_failures"] == 0:
+
+            if validation_result["warning_failures"] > 0:
+
+                logger.warning(
+                    "Validation completed with warnings."
+                )
+
+            else:
+
+                logger.info(
+                    "Validation completed successfully."
+                )
+
+            load_processed_tables_to_postgres()
+
+            logger.info(
+                "PostgreSQL load completed successfully."
+            )
+
+        else:
+
+            logger.error(
+                f"Critical validation failures detected: "
+                f"{validation_result['critical_failures']}"
+            )
+
+            logger.error(
+                "Skipping PostgreSQL load."
+            )
+
+
+        print_summary(
+            reports
+        )
+
+        pipeline_end = round(
+            time.time() - pipeline_start,
+            2
+        )
+
+        logger.info("")
+
+        logger.info("=" * 80)
 
         logger.info(
-            "Validation completed successfully."
+            f"TOTAL PIPELINE EXECUTION TIME : "
+            f"{pipeline_end} seconds"
         )
 
-    else:
+        logger.info("=" * 80)
 
-        logger.warning(
-            "Validation completed with errors."
+        logger.info("")
+
+        end_time = datetime.now()
+
+        log_pipeline_run(
+            pipeline_name="ETL",
+            start_time=start_time,
+            end_time=end_time,
+            status="Success",
+            records_processed=records_processed
         )
 
-    print_summary(
-        reports
-    )
+    except Exception as e:
 
-    pipeline_end = round(
+        end_time = datetime.now()
 
-        time.time() - pipeline_start,
+        log_pipeline_run(
+            pipeline_name="ETL",
+            start_time=start_time,
+            end_time=end_time,
+            status="Failed",
+            records_processed=0
+        )
 
-        2
+        raise e
 
-    )
+
+    
+    logger.info("=" * 80)
 
     logger.info("")
 
-    logger.info("=" * 80)
-
-    logger.info(
-
-        f"TOTAL PIPELINE EXECUTION TIME : "
-
-        f"{pipeline_end} seconds"
-
-    )
-
-    logger.info("=" * 80)
-
-    logger.info("")
 
 
+
+      
 # ---------------------------------------------------------
 # Execute Pipeline
 # ---------------------------------------------------------
@@ -625,22 +730,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
-# ---------------------------------------------------------
-# Running load_to_postgres.py and storing all csv files into Postgres database
-# ---------------------------------------------------------
-
-import subprocess
-import sys
-from pathlib import Path
-
-print("\nLoading data into PostgreSQL...")
-
-script_path = Path(__file__).parent / "load_to_postgres.py"
-
-subprocess.run(
-    [sys.executable, str(script_path)],
-    check=True
-)
-
-print("PostgreSQL loading completed.")

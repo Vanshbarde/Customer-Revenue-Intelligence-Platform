@@ -1,10 +1,10 @@
 Rows Before,Rows After,Duplicates Removed,Rows Removed (Missing Primary Key),Status,Execution Time,Dataset,Execution Time (Seconds),Input File,Output File
-99441,99441,0,0,SUCCESS,2026-08-02 15:34:42,customers,1.48,olist_customers_dataset.csv,olist_customers_dataset_cleaned.csv
-99441,99441,0,0,SUCCESS,2026-08-02 15:34:46,orders,4.68,olist_orders_dataset.csv,olist_orders_dataset_cleaned.csv
-112650,112650,0,0,SUCCESS,2026-08-02 15:34:49,order_items,2.61,olist_order_items_dataset.csv,olist_order_items_dataset_cleaned.csv
-32951,32951,0,0,SUCCESS,2026-08-02 15:34:50,products,0.58,olist_products_dataset.csv,olist_products_dataset_cleaned.csv
-3095,3095,0,0,SUCCESS,2026-08-02 15:34:50,sellers,0.07,olist_sellers_dataset.csv,olist_sellers_dataset_cleaned.csv
-103887,103886,0,1,SUCCESS,2026-08-02 15:34:51,payments,1.01,olist_order_payments_dataset.csv,olist_order_payments_dataset_cleaned.csv
-99224,99224,0,0,SUCCESS,2026-08-02 15:34:53,reviews,2.46,olist_order_reviews_dataset.csv,olist_order_reviews_dataset_cleaned.csv
-1000163,738327,261836,0,SUCCESS,2026-08-02 15:35:01,geolocation,8.15,olist_geolocation_dataset.csv,olist_geolocation_dataset_cleaned.csv
-71,71,0,0,SUCCESS,2026-08-02 15:35:01,category_translation,0.02,product_category_name_translation.csv,product_category_name_translation_cleaned.csv
+99441,99441,0,0,SUCCESS,2026-08-10 00:56:18,customers,1.34,olist_customers_dataset.csv,olist_customers_dataset_cleaned.csv
+99441,99441,0,0,SUCCESS,2026-08-10 00:56:22,orders,4.01,olist_orders_dataset.csv,olist_orders_dataset_cleaned.csv
+112650,112650,0,0,SUCCESS,2026-08-10 00:56:24,order_items,1.77,olist_order_items_dataset.csv,olist_order_items_dataset_cleaned.csv
+32951,32951,0,0,SUCCESS,2026-08-10 00:56:25,products,0.48,olist_products_dataset.csv,olist_products_dataset_cleaned.csv
+3095,3095,0,0,SUCCESS,2026-08-10 00:56:25,sellers,0.08,olist_sellers_dataset.csv,olist_sellers_dataset_cleaned.csv
+103887,103886,0,1,SUCCESS,2026-08-10 00:56:25,payments,0.7,olist_order_payments_dataset.csv,olist_order_payments_dataset_cleaned.csv
+99224,99224,0,0,SUCCESS,2026-08-10 00:56:28,reviews,2.05,olist_order_reviews_dataset.csv,olist_order_reviews_dataset_cleaned.csv
+1000163,738327,261836,0,SUCCESS,2026-08-10 00:56:34,geolocation,6.04,olist_geolocation_dataset.csv,olist_geolocation_dataset_cleaned.csv
+71,71,0,0,SUCCESS,2026-08-10 00:56:34,category_translation,0.05,product_category_name_translation.csv,product_category_name_translation_cleaned.csv

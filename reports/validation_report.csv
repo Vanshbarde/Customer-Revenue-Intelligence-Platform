@@ -1,42 +1,60 @@
 Dataset,Validation,Status,Invalid Rows,Remarks
 customers,Required Columns,PASS,0,All required columns exist.
+customers,Duplicate Rows,PASS,0,No duplicate rows found.
+customers,Column Types,PASS,0,Column type validation passed.
 customers,NOT NULL Validation,PASS,0,No NULL values.
 customers,Unique Columns,PASS,0,Unique constraint passed.
 customers,Numeric Range,PASS,0,Numeric validation passed.
 orders,Required Columns,PASS,0,All required columns exist.
+orders,Duplicate Rows,PASS,0,No duplicate rows found.
+orders,Column Types,PASS,0,Column type validation passed.
 orders,NOT NULL Validation,PASS,0,No NULL values.
 orders,Unique Columns,PASS,0,Unique constraint passed.
 orders,Allowed Values,PASS,0,Allowed value validation passed.
 orders,Date Sequence,FAIL,61,order_approved_at > order_delivered_customer_date (61)
 orders,Foreign Keys,PASS,0,Foreign key validation passed.
 order_items,Required Columns,PASS,0,All required columns exist.
+order_items,Duplicate Rows,PASS,0,No duplicate rows found.
+order_items,Column Types,PASS,0,Column type validation passed.
 order_items,NOT NULL Validation,PASS,0,No NULL values.
 order_items,Composite Unique Columns,PASS,0,Composite key validation passed.
 order_items,Numeric Range,PASS,0,Numeric validation passed.
 order_items,Foreign Keys,PASS,0,Foreign key validation passed.
 products,Required Columns,PASS,0,All required columns exist.
+products,Duplicate Rows,PASS,0,No duplicate rows found.
+products,Column Types,PASS,0,Column type validation passed.
 products,NOT NULL Validation,PASS,0,No NULL values.
 products,Unique Columns,PASS,0,Unique constraint passed.
 products,Numeric Range,PASS,0,Numeric validation passed.
 sellers,Required Columns,PASS,0,All required columns exist.
+sellers,Duplicate Rows,PASS,0,No duplicate rows found.
+sellers,Column Types,PASS,0,Column type validation passed.
 sellers,NOT NULL Validation,PASS,0,No NULL values.
 sellers,Unique Columns,PASS,0,Unique constraint passed.
 sellers,Numeric Range,PASS,0,Numeric validation passed.
 payments,Required Columns,PASS,0,All required columns exist.
+payments,Duplicate Rows,PASS,0,No duplicate rows found.
+payments,Column Types,PASS,0,Column type validation passed.
 payments,NOT NULL Validation,PASS,0,No NULL values.
 payments,Composite Unique Columns,PASS,0,Composite key validation passed.
 payments,Numeric Range,PASS,0,Numeric validation passed.
 payments,Allowed Values,PASS,0,Allowed value validation passed.
 payments,Foreign Keys,PASS,0,Foreign key validation passed.
 reviews,Required Columns,PASS,0,All required columns exist.
+reviews,Duplicate Rows,PASS,0,No duplicate rows found.
+reviews,Column Types,PASS,0,Column type validation passed.
 reviews,NOT NULL Validation,PASS,0,No NULL values.
 reviews,Composite Unique Columns,PASS,0,Composite key validation passed.
 reviews,Numeric Range,PASS,0,Numeric validation passed.
 reviews,Date Sequence,PASS,0,Date sequence validation passed.
 reviews,Foreign Keys,PASS,0,Foreign key validation passed.
 geolocation,Required Columns,PASS,0,All required columns exist.
+geolocation,Duplicate Rows,PASS,0,No duplicate rows found.
+geolocation,Column Types,PASS,0,Column type validation passed.
 geolocation,NOT NULL Validation,PASS,0,No NULL values.
 geolocation,Numeric Range,PASS,0,Numeric validation passed.
 category_translation,Required Columns,PASS,0,All required columns exist.
+category_translation,Duplicate Rows,PASS,0,No duplicate rows found.
+category_translation,Column Types,PASS,0,Column type validation passed.
 category_translation,NOT NULL Validation,PASS,0,No NULL values.
 category_translation,Unique Columns,PASS,0,Unique constraint passed.

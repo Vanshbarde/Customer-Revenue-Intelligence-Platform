@@ -288,6 +288,124 @@ def validate_unique_columns(
 
 
 # ======================================================
+# Validate Duplicate Rows
+# ======================================================
+
+def validate_duplicate_rows(
+    df: pd.DataFrame
+) -> tuple[bool, int, str]:
+    """
+    Validate that the dataset does not contain exact duplicate rows.
+    """
+
+    duplicate_rows = int(df.duplicated().sum())
+
+    if duplicate_rows > 0:
+
+        return (
+
+            False,
+
+            duplicate_rows,
+
+            f"Duplicate rows found: {duplicate_rows}"
+
+        )
+
+    return (
+
+        True,
+
+        0,
+
+        "No duplicate rows found."
+
+    )
+
+
+# ======================================================
+# Validate Column Data Types
+# ======================================================
+
+def validate_column_types(
+    df: pd.DataFrame,
+    numeric_columns: list = None,
+    date_columns: list = None
+) -> tuple[bool, int, str]:
+    """
+    Validate that numeric and date columns can be safely parsed.
+    """
+
+    numeric_columns = numeric_columns or []
+    date_columns = date_columns or []
+
+    invalid_rows = 0
+    failed_columns = []
+
+    for col in numeric_columns:
+
+        if col not in df.columns:
+
+            continue
+
+        coerced = pd.to_numeric(df[col], errors="coerce")
+        invalid = df[col].notna() & coerced.isna()
+        count = int(invalid.sum())
+
+        if count > 0:
+
+            invalid_rows += count
+
+            failed_columns.append(
+
+                f"{col} (numeric, {count})"
+
+            )
+
+    for col in date_columns:
+
+        if col not in df.columns:
+
+            continue
+
+        coerced = pd.to_datetime(df[col], errors="coerce")
+        invalid = df[col].notna() & coerced.isna()
+        count = int(invalid.sum())
+
+        if count > 0:
+
+            invalid_rows += count
+
+            failed_columns.append(
+
+                f"{col} (datetime, {count})"
+
+            )
+
+    if invalid_rows > 0:
+
+        return (
+
+            False,
+
+            invalid_rows,
+
+            ", ".join(failed_columns)
+
+        )
+
+    return (
+
+        True,
+
+        0,
+
+        "Column type validation passed."
+
+    )
+
+
+# ======================================================
 # Validate Composite Unique Columns
 # ======================================================
 
@@ -716,6 +834,16 @@ def validate_dataset(
 
     overall_status = True
 
+
+    critical_validations = [
+         "Required Columns",
+         "Column Types",
+         "NOT NULL Validation",
+          "Unique Columns",
+          "Composite Unique Columns",
+          "Foreign Keys"
+    ]
+
     # --------------------------------------------------
     # Required Columns
     # --------------------------------------------------
@@ -735,6 +863,69 @@ def validate_dataset(
         dataset_name,
 
         "Required Columns",
+
+        "PASS" if status else "FAIL",
+
+        invalid_rows,
+
+        remarks
+
+    )
+
+    overall_status &= status
+
+    # --------------------------------------------------
+    # Duplicate Rows
+    # --------------------------------------------------
+
+    status, invalid_rows, remarks = validate_duplicate_rows(
+
+        df
+
+    )
+
+    add_validation_result(
+
+        report,
+
+        dataset_name,
+
+        "Duplicate Rows",
+
+        "PASS" if status else "FAIL",
+
+        invalid_rows,
+
+        remarks
+
+    )
+
+    if not status:
+        logger.warning(
+            f"{dataset_name}: Duplicate Rows validation failed"
+    )
+
+    # --------------------------------------------------
+    # Column Type Validation
+    # --------------------------------------------------
+
+    status, invalid_rows, remarks = validate_column_types(
+
+        df,
+
+        dataset_config.get("numeric_columns", []),
+
+        dataset_config.get("date_columns", [])
+
+    )
+
+    add_validation_result(
+
+        report,
+
+        dataset_name,
+
+        "Column Types",
 
         "PASS" if status else "FAIL",
 
@@ -872,7 +1063,10 @@ def validate_dataset(
 
         )
 
-        overall_status &= status
+        if not status:
+
+           logger.warning(
+              f"{dataset_name}: Numeric Range validation failed")
 
     # --------------------------------------------------
     # Allowed Values Validation
@@ -904,7 +1098,10 @@ def validate_dataset(
 
         )
 
-        overall_status &= status
+        if not status:
+           logger.warning(
+               f"{dataset_name}: Allowed Values validation failed"
+           )
 
     # ======================================================
     # Data sequence Validation
@@ -936,7 +1133,10 @@ def validate_dataset(
 
         )
 
-        overall_status &= status
+        if not status:
+            logger.warning(
+                f"{dataset_name}: Date Sequence validation failed"
+            )
 
     # ======================================================
     # Foreign key validation
@@ -1063,6 +1263,7 @@ def run_validation_pipeline(
         report_path
 
     )
+    
 
     logger.info("")
 
@@ -1082,8 +1283,43 @@ def run_validation_pipeline(
 
     )
 
-    return overall_success
+    report_df = pd.DataFrame(report)
 
+    critical_validations = [
+        "Required Columns",
+        "Column Types",
+        "NOT NULL Validation",
+        "Unique Columns",
+        "Composite Unique Columns",
+        "Foreign Keys"
+    ]
+
+    critical_failures = len(
+        report_df[
+            (report_df["Status"] == "FAIL") &
+            (report_df["Validation"].isin(critical_validations))
+        ]
+    )
+
+    warning_failures = len(
+        report_df[
+            (report_df["Status"] == "FAIL") &
+            (~report_df["Validation"].isin(critical_validations))
+        ]
+    )
+
+    return {
+        "overall_status":
+            "FAILED"
+            if critical_failures > 0
+            else "WARNING"
+            if warning_failures > 0
+            else "SUCCESS",
+
+        "critical_failures": critical_failures,
+
+        "warning_failures": warning_failures
+    }
 
 # ======================================================
 # Main (Testing Only)
