@@ -675,3 +675,10 @@ WHERE viewname = 'vw_product_intelligence';
 SELECT definition
 FROM pg_views
 WHERE viewname = 'vw_product_performance';
+
+
+-- checking all the views
+SELECT table_name
+FROM information_schema.views
+WHERE table_schema = 'public'
+ORDER BY table_name;
