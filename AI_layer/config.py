@@ -10,3 +10,17 @@ DB_CONFIG = {
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD")
 }
+
+
+
+
+# GENINI API KEY
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv(
+    "GEMINI_API_KEY"
+)

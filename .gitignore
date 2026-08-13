@@ -1,0 +1,10 @@
+
+
+# IGNORE ENVIRONMENT FILES
+.env
+
+# IGNORE  _pycache__ FOLDERS
+__pycache__/
+
+*.pyc
+tempCodeRunnerFile.py
